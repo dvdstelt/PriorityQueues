@@ -14,10 +14,7 @@ namespace StrategicReceiver.Handlers
 
         public Task Handle(SubmitOrder message, IMessageHandlerContext context)
         {
-            if (Customers.GetPriorityCustomers().Contains(message.CustomerId))
-            {
-                log.Info($"Message received with CustomerId [{message.CustomerId}]");
-            }
+            log.Info($"Message received with CustomerId [{message.CustomerId}]");
 
             return Task.CompletedTask;
         }

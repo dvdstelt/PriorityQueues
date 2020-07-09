@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StrategicReceiver", "Strate
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegularReceiver", "RegularReceiver\RegularReceiver.csproj", "{5BACFF65-1218-4C70-A3B3-9D54A3A9C242}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrategicReceiver.Interceptor", "StrategicReceiver.Sender\StrategicReceiver.Interceptor.csproj", "{B281D5F7-3D6A-4CF4-A3D0-9960375D223C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StrategicReceiver.Interceptor", "StrategicReceiver.Sender\StrategicReceiver.Interceptor.csproj", "{B281D5F7-3D6A-4CF4-A3D0-9960375D223C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegularReceiver.Interceptor", "RegularInterceptor\RegularReceiver.Interceptor.csproj", "{C85C8AD9-42C6-4FE4-B424-D658B705C723}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{B281D5F7-3D6A-4CF4-A3D0-9960375D223C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B281D5F7-3D6A-4CF4-A3D0-9960375D223C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B281D5F7-3D6A-4CF4-A3D0-9960375D223C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C85C8AD9-42C6-4FE4-B424-D658B705C723}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C85C8AD9-42C6-4FE4-B424-D658B705C723}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C85C8AD9-42C6-4FE4-B424-D658B705C723}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C85C8AD9-42C6-4FE4-B424-D658B705C723}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

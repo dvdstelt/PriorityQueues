@@ -12,7 +12,7 @@ using Shared.Notifications;
 
 namespace Sender
 {
-    public class Worker : BackgroundService
+    public class Worker
     {
         const int BatchSize = 250;
 
@@ -27,9 +27,8 @@ namespace Sender
             this.mediator = mediator;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        internal async Task Run()
         {
-            log.LogInformation("Mwahahaha");
             DisplayHeader();
 
             while (true)

@@ -14,13 +14,10 @@ namespace RegularReceiver.Handler
 
         public async Task Handle(SubmitOrder message, IMessageHandlerContext context)
         {
-            if (!Customers.GetPriorityCustomers().Contains(message.CustomerId))
-            {
-                log.Info($"Message received with CustomerId [{message.CustomerId}]");
+            log.Info($"Message received with CustomerId [{message.CustomerId}]");
 
-                // Emulate a delay as if RegularReceiver is slower than StrategicReceiver
-                await Task.Delay(250);
-            }
+            // Emulate a delay as if RegularReceiver is slower than StrategicReceiver
+            await Task.Delay(250);
         }
     }
 }
