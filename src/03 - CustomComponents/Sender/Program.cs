@@ -1,99 +1,102 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NServiceBus;
+using NServiceBus.Hosting.Helpers;
 using Shared;
 using Shared.Configuration;
 using Shared.Messages;
+using Shared.Notifications;
 
 namespace Sender
 {
     class Program
     {
-        const int BatchSize = 250;
-
-        private static IEndpointInstance endpointInstance;
-        private static readonly Random random = new Random();
-        private static readonly Guid[] customers = Customers.GetAllCustomers().ToArray();
-
-
         static async Task Main(string[] args)
         {
-            DisplayHeader();
+            // We're using NServiceBus anyway, so let's use it to scan all assemblies.
+            var assemblyScannerResults = new AssemblyScanner().GetScannableAssemblies();
 
-            var endpointConfiguration = new EndpointConfiguration("Sender")
-                .ApplyDefaultConfiguration(routing =>
-                {
-                    routing.RouteToEndpoint(typeof(SubmitOrder), "RegularReceiver");
-                });
+            // Self DI
 
-            endpointInstance = await Endpoint.Start(endpointConfiguration);
-            Console.ForegroundColor = ConsoleColor.White;
+            var services = new ServiceCollection();
+            services.AddTransient<ConsoleApplication>();
+            services.AddMediatR(assemblyScannerResults.Assemblies.ToArray());
+            services.AddLogging(configure => configure.AddConsole());
+            
+            await services.BuildServiceProvider().GetService<ConsoleApplication>().Run();
 
-            while (true)
+            return;
+            
+
+            /// Generic Host
+
+            var builder = Host.CreateDefaultBuilder(args);
+            builder.UseNServiceBus(ctx =>
             {
-                var key = Console.ReadKey(true);
-                Console.WriteLine();
+                var endpointConfiguration = new EndpointConfiguration("Sender");
+                endpointConfiguration.ApplyDefaultConfiguration();
 
-                switch (key.Key)
-                {
-                    case ConsoleKey.D1:
-                        await SendMessage();
-                        Console.WriteLine($"Messages sent");
-                        break;
-                    case ConsoleKey.D2:
-                        await SendBatch();
-                        Console.WriteLine($"{BatchSize} messages sent");
-                        break;
-                    case ConsoleKey.Q:
-                        Environment.Exit(0);
-                        break;
-                }
+                endpointConfiguration.DefineCriticalErrorAction(OnCriticalError);
+
+                return endpointConfiguration;
+            });
+            builder.ConfigureServices((ctx, services) =>
+            {
+                services.AddMediatR(assemblyScannerResults.Assemblies.ToArray());
+            });
+            builder.UseConsoleLifetime();
+
+            builder.ConfigureLogging((ctx, logging) =>
+            {
+                logging.AddConsole();
+            });
+
+            await builder.RunConsoleAsync(CancellationToken.None);
+
+            //builder.Build().Run();
+        }
+
+        private static async Task OnCriticalError(ICriticalErrorContext context)
+        {
+            var fatalMessage =
+                $"The following critical error was encountered:{Environment.NewLine}{context.Error}{Environment.NewLine}Process is shutting down. StackTrace: {Environment.NewLine}{context.Exception.StackTrace}";
+            
+            Console.WriteLine(fatalMessage);
+
+            try
+            {
+                await context.Stop().ConfigureAwait(false);
+            }
+            finally
+            {
+                Environment.FailFast(fatalMessage, context.Exception);
             }
         }
+    }
 
-        private static void DisplayHeader()
+    internal class ConsoleApplication
+    {
+        private readonly IMediator mediator;
+
+        public ConsoleApplication(IMediator mediator)
         {
-            Console.Title = "Sender - Priority Queues";
-
-            var backgroundColor = Console.BackgroundColor;
-            var foregroundColor = Console.ForegroundColor;
-            var windowWith = Console.WindowWidth;
-
-            Console.BackgroundColor = ConsoleColor.DarkRed;
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Priority Queues via Publish/Subscribe".PadRight(windowWith - 1));
-
-            Console.BackgroundColor = ConsoleColor.Gray;
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("  [1] Publish a random customer message".PadRight(windowWith - 1));
-            Console.WriteLine($"  [2] Publish {BatchSize} random customer messages".PadRight(windowWith - 1));
-            Console.WriteLine("  [q] To quit".PadRight(windowWith - 1));
-
-            Console.BackgroundColor = backgroundColor;
-            Console.ForegroundColor = foregroundColor;
+            this.mediator = mediator;
         }
 
-        static async Task SendBatch()
+        public async Task Run()
         {
-            var tasks = new List<Task>();
+            await mediator.Publish(new OrderSubmitted() {CustomerIdentifier = Guid.NewGuid()});
 
-            for (int i = 0; i < BatchSize; i++)
-            {
-                tasks.Add(SendMessage());
-            }
-            await Task.WhenAll(tasks);
+            Console.WriteLine("Dude");
+            Console.ReadKey();
         }
 
-        private static async Task SendMessage()
-        {
-            var message = new SubmitOrder
-            {
-                CustomerId = customers[random.Next(customers.Length)]
-            };
-
-            await endpointInstance.Send(message).ConfigureAwait(false);
-        }
     }
 }
