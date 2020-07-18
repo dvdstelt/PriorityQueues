@@ -85,7 +85,7 @@ namespace Sender
 
         private static async Task SendMessage()
         {
-            var message = new SubmitOrder
+            var message = new OrderSubmitted
             {
                 CustomerId = customers[random.Next(customers.Length)]
             };

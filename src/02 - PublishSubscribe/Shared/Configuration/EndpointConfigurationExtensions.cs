@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NServiceBus;
+﻿using NServiceBus;
 using NServiceBus.Logging;
-using NServiceBus.Settings;
 
 namespace Shared.Configuration
 {

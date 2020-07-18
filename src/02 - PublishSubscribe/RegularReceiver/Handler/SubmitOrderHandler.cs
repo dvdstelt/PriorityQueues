@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Logging;
@@ -8,11 +7,11 @@ using Shared.Messages;
 
 namespace RegularReceiver.Handler
 {
-    public class SubmitOrderHandler : IHandleMessages<SubmitOrder>
+    public class SubmitOrderHandler : IHandleMessages<OrderSubmitted>
     {
         readonly ILog log = LogManager.GetLogger<SubmitOrderHandler>();
 
-        public async Task Handle(SubmitOrder message, IMessageHandlerContext context)
+        public async Task Handle(OrderSubmitted message, IMessageHandlerContext context)
         {
             if (!Customers.GetPriorityCustomers().Contains(message.CustomerId))
             {
