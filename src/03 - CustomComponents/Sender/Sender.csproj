@@ -14,7 +14,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RegularInterceptor\RegularReceiver.Interceptor.csproj" />
+    <ProjectReference Include="..\RegularReceiver.Interceptor\RegularReceiver.Interceptor.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\StrategicReceiver.Interceptor\StrategicReceiver.Interceptor.csproj" />
     <ProjectReference Include="..\StrategicReceiver.Sender\StrategicReceiver.Interceptor.csproj" />
   </ItemGroup>
 
